@@ -7,18 +7,26 @@
     android:paddingBottom = "@dimen/activity_vertical_margin" tools:context = ".MainActivity">
 
 
-    <EditText
-        android:layout_width = "wrap_content"
+    <TextView android:text = "Gps tracking" android:layout_width="wrap_content"
         android:layout_height = "wrap_content"
-        android:id = "@+id/editText"
-        android:hint = "Korisnicko ime"
-        android:focusable = "true"
-        android:textColorHighlight = "#ff7eff15"
-        android:textColorHint = "@android:color/holo_blue_light"
-        android:layout_marginTop="62dp"
-        android:layout_below="@+id/textview"
-        android:layout_alignLeft="@+id/editText2"
-        android:layout_alignStart="@+id/editText2"
+        android:id = "@+id/textview"
+        android:textSize = "35dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/editText"
+        android:layout_alignEnd="@+id/editText"
+        android:layout_alignLeft="@+id/imageView"
+        android:layout_alignStart="@+id/imageView" />
+
+    <Button
+        android:layout_height="wrap_content"
+        android:text="login"
+        android:id="@+id/button"
+        android:elevation="0dp"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/textview"
+        android:layout_alignStart="@+id/textview"
+        android:layout_marginBottom="34dp"
         android:layout_alignRight="@+id/editText2"
         android:layout_alignEnd="@+id/editText2" />
 
@@ -30,25 +38,35 @@
         android:id="@+id/editText2"
         android:textColorHint="@android:color/holo_blue_light"
         android:hint="Korisnicka sifra"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignBottom="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="74dp" />
 
-    <TextView android:text = "Prijava" android:layout_width="wrap_content"
+    <EditText
+        android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
-        android:id = "@+id/textview"
-        android:textSize = "35dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:id = "@+id/editText"
+        android:hint = "Korisnicko ime"
+        android:focusable = "true"
+        android:textColorHighlight = "#ff7eff15"
+        android:textColorHint = "@android:color/holo_blue_light"
+        android:layout_above="@+id/editText2"
+        android:layout_alignLeft="@+id/editText2"
+        android:layout_alignStart="@+id/editText2"
+        android:layout_marginBottom="28dp"
+        android:layout_alignRight="@+id/editText2"
+        android:layout_alignEnd="@+id/editText2"
+        android:ems="10" />
 
-    <Button
-        android:layout_height="wrap_content"
-        android:text="login"
-        android:id="@+id/button"
-        android:layout_marginTop="40dp"
-        android:elevation="0dp"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/editText2"
-        android:layout_alignLeft="@+id/textview"
-        android:layout_alignStart="@+id/textview" />
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/imageView"
+        android:src="@drawable/tracking"
+        android:layout_below="@+id/textview"
+        android:layout_alignLeft="@+id/editText"
+        android:layout_alignStart="@+id/editText"
+        android:layout_alignRight="@+id/editText"
+        android:layout_alignEnd="@+id/editText" />
 
 </RelativeLayout>
