@@ -1,16 +1,23 @@
 package example.com.mapaproba;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -22,9 +29,12 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    Boolean flag = false;
+    int i=0,j=0;
     private GoogleMap mMap;
     public List<String> lista_registracija;
     private List<String> lista_koordinata = new ArrayList<String>();
+    private List<Marker> markeri = new ArrayList<Marker>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         lista_registracija.add(registracija);
                     }
                     getKoordinateVozila();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -65,7 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             protected String doInBackground(Void... params) {
                 RequestHandler rh = new RequestHandler();
-                String s = rh.sendGetRequestParam("http://192.168.0.101:80/getVozila.php?id=", id,"");
+                String s = rh.sendGetRequestParam("http://10.0.2.2:80/getVozila.php?id=", id,"");
                 return s;
             }
         }
@@ -102,9 +113,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         System.out.println(duzina);
 
                         LatLng poz = new LatLng(Double.parseDouble(duzina),Double.parseDouble(sirina));
-                        mMap.addMarker(new MarkerOptions().position(poz).title(lista_registracija.get(i/2)));
+                        markeri.add(mMap.addMarker(new MarkerOptions().position(poz).title(lista_registracija.get(i/2))));
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(poz));
                         i++;
+                    }
+                    ArrayList<LatLng> krajnjePozicije = new ArrayList<LatLng>();
+                    for(int i = 0; i < markeri.size(); i++)
+                    {
+                        double latPomak = 3.0;
+                        double lngPomak = 2.5;
+                        if(i % 2 == 0)
+                        {
+                            latPomak = 2.0;
+                            lngPomak = -1.5;
+                        }
+                        LatLng pozFin = new LatLng(markeri.get(i).getPosition().latitude + latPomak, markeri.get(i).getPosition().longitude + lngPomak);
+                        krajnjePozicije.add(pozFin);
+                    }
+                    for(int i = 0; i < markeri.size(); i++)
+                    {
+                        animateMarker(markeri.get(i), krajnjePozicije.get(i), false);
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -116,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 List<String> str_list = new ArrayList<String>();
                 RequestHandler rh = new RequestHandler();
                 for (int i=0; i<lista_registracija.size();i++) {
-                    String s = rh.sendGetRequestParam("http://192.168.0.101:80/getGpsKoordinate.php?vozilo_id=", lista_registracija.get(i),"");
+                    String s = rh.sendGetRequestParam("http://10.0.2.2:80/getGpsKoordinate.php?vozilo_id=", lista_registracija.get(i),"");
                     str_list.add(s);
                 }
                 return str_list;
@@ -139,23 +168,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         lista_registracija = new ArrayList<String>();
         getVozila();
-        System.out.println("Duzina: " + Integer.toString(lista_registracija.size()));
-        //getKoordinateVozila();
-        // Add a marker in Sydney and move the camera
-        for (int i=0;i<lista_koordinata.size();i++) {
-            String duzina = lista_koordinata.get(i);
-            String sirina = lista_koordinata.get(i+1);
-            System.out.println(duzina);
+    }
 
-            LatLng poz = new LatLng(Double.parseDouble(duzina),Double.parseDouble(sirina));
-            mMap.addMarker(new MarkerOptions().position(poz).title(lista_registracija.get(i)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(poz));
-            i++;
-        }
-        /*
-        LatLng sydney = new LatLng(-34, 151);
-        String s = getIntent().getStringExtra("KORISNIK_ID");
-        mMap.addMarker(new MarkerOptions().position(sydney).title(s));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+    public void animateMarker(final Marker marker, final LatLng toPosition,
+                              final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 60000;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 1000);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
     }
 }

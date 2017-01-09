@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MapaProba.iml" filepath="$PROJECT_DIR$/MapaProba.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VozniParkAndroid.iml" filepath="$PROJECT_DIR$/VozniParkAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

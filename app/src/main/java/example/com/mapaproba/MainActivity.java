@@ -86,7 +86,7 @@ public class MainActivity extends Activity  {
             @Override
             protected String doInBackground(Void... params) {
                 RequestHandler rh = new RequestHandler();
-                String s = rh.sendGetRequestParam("http://192.168.0.101:80/getLogin.php?user=", username, password);
+                String s = rh.sendGetRequestParam("http://10.0.2.2:80/getLogin.php?user=", username, password);
                 return s;
             }
         }
